@@ -6,30 +6,31 @@
 
   
  <script>
-  document.addEventListener("DOMContentLoaded", function() {
-  // List of allowed URLs
-  const allowedURLs = [
-      'https://pugmoog.github.io/survival-race-2/index.html',
-      'https://sites.google.com/view/pgmg2/games-mbd/survival-race-1',
-      'https://google.com'
-  ];
+        document.addEventListener("DOMContentLoaded", function() {
+            // List of allowed referrer URLs
+            const allowedURLs = [
+                'https://pugmoog.github.io/survival-race-2/index.html', // Allow access to this
+                'https://sites.google.com/view/pgmg2/games-mbd/survival-race-1', // Allowed
+                'https://google.com' // Allowed
+            ];
 
-  // Get the referring URL
-  const referrer = document.referrer;
+            // Get the referring URL
+            const referrer = document.referrer;
 
-  // Check if the referrer matches any of the allowed URLs
-  const isAllowed = allowedURLs.some(url => referrer === url);
+            // Check if the referrer matches any of the allowed URLs
+            const isAllowed = allowedURLs.some(url => referrer === url);
 
-  // If the current window is not allowed
-  if (!isAllowed) {
-      document.body.innerHTML = '<h1>Embedding is not allowed from this domain.</h1>';
-      alert("Imagine stealing files from Pugmoog");
-  }
+            // If the current window is not allowed, replace the content
+            if (!isAllowed) {
+                document.body.innerHTML = '<h1>Embedding is not allowed from this domain.</h1>';
+                alert("Imagine stealing files from Pugmoog");
+            }
 
-   console.log(referrer);
-   console.log(isAllowed);
-  });
-</script>
+            // Debug logs
+            console.log(referrer);
+            console.log(isAllowed);
+        });
+    </script>
 
 
 
