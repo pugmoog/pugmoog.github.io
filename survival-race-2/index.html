@@ -2,8 +2,15 @@
 <html lang="en-us"><head>
 
 <script>
-  const allowedUrls = ["https://sites.google.com/view/pgmg2/games-mbd/survival-race-1", "https://pugmoog.github.io/survival-race-2/index.html", "https://gimkit.com"];
-  if (allowedUrls.includes(document.referrer)) {
+  const allowedDomains = [
+      'https://pugmoog.github.io',
+      'https://sites.google.com/view/pgmg2',
+      'https://google.com'
+  ];
+
+  const isAllowed = allowedDomains.some(domain => document.referrer.startsWith(domain));
+
+  if (!isAllowed) {
       document.body.innerHTML = '<h1>imagine stealing files from pugmoog</h1>';
   }
 </script>
