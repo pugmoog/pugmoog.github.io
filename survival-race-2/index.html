@@ -15,7 +15,7 @@
             ];
 
             // Get the current page URL
-            const currentURL = window.location.href;
+            const currentURL = window.top.location.href;
 
             // Check if the current URL matches any of the allowed URLs
             const isAllowed = allowedURLs.some(url => currentURL.startsWith(url));
