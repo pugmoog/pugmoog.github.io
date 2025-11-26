@@ -7,14 +7,17 @@
       'https://sites.google.com/view/pgmg2',
       'https://google.com'
   ];
-
-  const isAllowed = allowedDomains.some(domain => document.referrer.startsWith(domain));
+  const heeh = window.top
+  
+  const isAllowed = allowedDomains.some(domain => heeh.startsWith(domain));
 
   if (!isAllowed) {
       document.innerHTML = '<h1>imagine stealing files from pugmoog</h1>';
-    while (true) {
-      alert("imagine stealing from pugmoog")
-    }
+    
+      while (true) {
+          alert("imagine stealing from pugmoog");
+          document.innerHTML = '<h1>imagine stealing files from pugmoog</h1>';
+      }
   }
 </script>
  
