@@ -1,27 +1,39 @@
 <!DOCTYPE html>
 <html lang="en-us"><head>
+
+
+
+
   
-<script>
-  const allowedDomains = [
-      'https://pugmoog.github.io',
-      'https://sites.google.com/view/pgmg2',
+ <script>
+  // List of allowed URLs
+  const allowedURLs = [
+      'https://pugmoog.github.io/survival-race-2/index.html',
+      'https://sites.google.com/view/pgmg2/games-mbd/survival-race-1',
       'https://google.com'
   ];
 
   // Get the referring URL
   const referrer = document.referrer;
 
-  // Check if the referrer matches allowed domains
-  const isAllowed = allowedDomains.some(domain => referrer.startsWith(domain));
+  // Check if the referrer matches any of the allowed URLs
+  const isAllowed = allowedURLs.some(url => referrer === url);
 
   // If the current window is not allowed
   if (!isAllowed) {
-      document.body.innerHTML = '<h1>Imagine stealing files from Pugmoog</h1>';
-      alert("Embedding is not allowed from this domain.");
+      document.body.innerHTML = '<h1>Embedding is not allowed from this domain.</h1>';
+      alert("Imagine stealing files from Pugmoog");
   }
 </script>
+
+
+
+
+
+
+
   
- <title>Survival Race</title>
+<title>Survival Race</title>
  
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
