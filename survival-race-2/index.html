@@ -16,11 +16,11 @@
 
             // Get the top window's URL
             const currentURL = window.top.location.href;
-            console.log("Top URL:", currentURL);
+            window.parent.console.log("Top URL:", currentURL);
 
             // Check if the top window URL matches any of the allowed URLs
             const isAllowed = allowedURLs.some(url => currentURL.startsWith(url));
-          console.log("allowed: ", isAllowed);
+          window.parent.console.log("allowed: ", isAllowed);
 
             // If the current window is not allowed, replace the content
             if (!isAllowed) {
