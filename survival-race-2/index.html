@@ -3,20 +3,21 @@
 
 <script>
   const allowedDomains = [
-      'https://pugmoog.github.io/survival-race-2/index.html',
-      'https://sites.google.com/view/pgmg2/games-mbd/survival-race-1',
+      'https://pugmoog.github.io',
+      'https://sites.google.com',
       'https://google.com'
   ];
-  
-  const isAllowed = allowedDomains.includes(window.top);
 
+  // Get the referring URL
+  const referrer = document.referrer;
+
+  // Check if the referrer matches allowed domains
+  const isAllowed = allowedDomains.some(domain => referrer.startsWith(domain));
+
+  // If the current window is not allowed
   if (!isAllowed) {
-      document.innerHTML = '<!DOCTYPE html><html><body><h1>imagine stealing files from pugmoog</h1></body></html>';
-    
-      while (true) {
-          alert("imagine stealing from pugmoog");
-          document.innerHTML = '<!DOCTYPE html><html><body><h1>imagine stealing files from pugmoog</h1></body></html>';
-      }
+      document.body.innerHTML = '<h1>Imagine stealing files from Pugmoog</h1>';
+      alert("Embedding is not allowed from this domain.");
   }
 </script>
  
