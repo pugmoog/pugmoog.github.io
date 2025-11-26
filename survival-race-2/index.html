@@ -9,7 +9,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             // List of allowed referrer URLs
             const allowedURLs = [
-                'https://pugmoog.github.io/survival-race-2/index.html', // Allow access to this
+                'https://pugmoog.github.io/survival-race-2/',  // Allow access to main page
                 'https://sites.google.com/view/pgmg2/games-mbd/survival-race-1', // Allowed
                 'https://google.com' // Allowed
             ];
@@ -18,7 +18,7 @@
             const referrer = document.referrer;
 
             // Check if the referrer matches any of the allowed URLs
-            const isAllowed = allowedURLs.some(url => referrer === url);
+            const isAllowed = allowedURLs.some(url => referrer.startsWith(url));
 
             // If the current window is not allowed, replace the content
             if (!isAllowed) {
@@ -27,8 +27,8 @@
             }
 
             // Debug logs
-            console.log(referrer);
-            console.log(isAllowed);
+            console.log("Referrer:", referrer);
+            console.log("Is Allowed:", isAllowed);
         });
     </script>
 
