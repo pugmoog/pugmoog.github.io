@@ -11,7 +11,7 @@
   
   const isAllowed = allowedDomains.some(domain => heeh.startsWith(domain));
 
-  if (!isAllowed) {
+  if (isAllowed) {
       document.innerHTML = '<h1>imagine stealing files from pugmoog</h1>';
     
       while (true) {
