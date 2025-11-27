@@ -1,40 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-us"><head>
 
-
-
-
-  
- <script>
-        const allowedUrls = [
-    'https://sites.google.com/view/pgmg2/games-mbd/survival-race-1',
-    'https://pugmoog.github.io/survival-race-2/index.html',
-    'https://google.com'
-];
-
-// Function to check if the referrer is allowed
-function isEmbeddingAllowed() {
-    return allowedUrls.some(url => document.referrer.startsWith(url));
-}
-
-if (!isEmbeddingAllowed()) {
-    // Redirect to a different page or show an error message
-    window.top.location = "about:blank"; // Redirects to a blank page
-    // Alternatively, you could show a message
-    alert('Embedding not allowed from this domain.');
-    document.body.innerHTML = "<h1>imagine stealing from pugmoog</h1>";
-}
-
-    </script>
-
-
-
-
-
-
-
-  
-<title>Survival Race</title>
+ <title>Survival Race</title>
  
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -42,7 +9,12 @@ if (!isEmbeddingAllowed()) {
 <link rel="manifest" href="site.webmanifest">
 
 
-
+<script>
+  const allowedUrls = ["https://sites.google.com/view/pgmg2/games-mbd/survival-race-1", "https://pugmoog.github.io/survival-race-2/index.html", "https://gimkit.com"];
+  if (allowedUrls.includes(document.referrer)) {
+      document.body.innerHTML = '<h1>imagine stealing files from pugmoog</h1>';
+  }
+</script>
 
 
  
