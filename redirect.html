@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Warning</title>
+  </head>
+  <body>
+    
+    <h1>Please don't play games on pugmoog.github.io. You can acces the same games and more at the 
+      <a href="https://sites.google.com/view/pugmoog">Pugmoog Google site</a>.</h1>
+    <h3>If you are sure you want to visit the game page on pugmoog.github.io, click <a href="none yet" id="link">here</a>.</h3>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const gameName = params.get('g');
+      const gameLink = "https://pugmoog.github.io/games/" + gameName;
+
+      const link = document.getElementById("link");
+      link.href = gameLink;
+    </script>
+    
+  </body>
+</html>
