@@ -31,13 +31,6 @@
     const input = document.querySelector('#url');
     const stage = document.querySelector('#stage');
 
-    function encodeUrl(value) {
-      const bytes = new TextEncoder().encode(value);
-      let binary = '';
-      bytes.forEach(byte => binary += String.fromCharCode(byte));
-      return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    }
-
     function normalizeUrl(value) {
       const trimmed = value.trim();
       return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
@@ -51,7 +44,7 @@
       const frame = document.createElement('iframe');
       frame.referrerPolicy = 'no-referrer';
       frame.allow = 'fullscreen';
-      frame.src = `${BACKEND}/p/${encodeUrl(url)}/`;
+      frame.src = `${BACKEND}/?url=${encodeURIComponent(url)}`;
       frame.title = `Proxied view of ${url}`;
       stage.appendChild(frame);
       history.replaceState(null, '', `?url=${encodeURIComponent(url)}`);
