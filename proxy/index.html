@@ -20,7 +20,7 @@
 <body>
   <header>
     <form id="proxy-form">
-      <input id="url" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="https://example.com" aria-label="Website URL" required>
+      <input id="url" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="https://start.duckduckgo.com" aria-label="Website URL">
       <button type="submit">Open</button>
     </form>
   </header>
@@ -33,6 +33,7 @@
 
     function normalizeUrl(value) {
       const trimmed = value.trim();
+      if (!trimmed) return 'https://start.duckduckgo.com';
       return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
     }
 
@@ -58,7 +59,8 @@
     input.addEventListener('input', () => input.setCustomValidity(''));
 
     const initial = new URLSearchParams(location.search).get('url');
-    if (initial) { input.value = initial; openUrl(initial); }
+    if (initial) input.value = initial;
+    openUrl(initial || '');
   </script>
 </body>
 </html>
