@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bugmoog Stats</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root { font-family: Arial, Helvetica, sans-serif; color: #1b1b1b; background: #fff; }
+    body { width: min(1100px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 60px; }
+    header { display: flex; align-items: end; justify-content: space-between; gap: 20px; border-bottom: 1px solid #aaa; padding-bottom: 18px; }
+    h1 { margin: 0; font: 2.5rem/1 "Times New Roman", Times, serif; }
+    h2 { margin: 0; font-size: 1.15rem; }
+    p { line-height: 1.45; }
+    a { color: #0645ad; }
+    button, select { font: inherit; }
+    button, select { border: 1px solid #444; border-radius: 5px; background: #eee; color: #111; padding: 9px 11px; }
+    button { cursor: pointer; }
+    button:hover { background: #ddd; }
+    .controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; padding: 22px 0 14px; }
+    label { display: grid; gap: 4px; color: #555; font-size: .78rem; font-weight: bold; }
+    select { min-width: 130px; background: #fff; font-weight: normal; }
+    #series { min-width: 240px; }
+    #status { margin: 0 0 14px; min-height: 1.4em; color: #666; font-size: .9rem; }
+    .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+    .card { border: 1px solid #999; border-radius: 7px; padding: 14px; background: #fafafa; }
+    .card strong { display: block; margin-top: 6px; font-size: 1.65rem; }
+    .chart-panel { position: relative; border: 1px solid #777; border-radius: 8px; padding: 14px; background: #fff; }
+    .chart-heading { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+    #chart { display: block; width: 100%; min-height: 330px; overflow: visible; }
+    .grid-line { stroke: #ddd; stroke-width: 1; }
+    .axis-label { fill: #666; font: 12px Arial, sans-serif; }
+    .data-line { fill: none; stroke: #1769aa; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .data-dot { fill: #1769aa; }
+    #tooltip { position: absolute; display: none; pointer-events: none; padding: 7px 9px; border: 1px solid #444; border-radius: 4px; background: #fff; box-shadow: 2px 2px 0 #bbb; font-size: .8rem; white-space: nowrap; }
+    .empty { fill: #666; font: 16px Arial, sans-serif; text-anchor: middle; }
+    .table-section { margin-top: 24px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 8px 7px; border-bottom: 1px solid #ccc; text-align: left; }
+    th { font-size: .8rem; color: #555; }
+    td:nth-child(n+2), th:nth-child(n+2) { text-align: right; }
+    .note { color: #666; font-size: .8rem; }
+    #exit-graph { display: none; position: fixed; top: 10px; right: 10px; z-index: 5; }
+    body.graph-only { width: 100%; padding: 0; }
+    body.graph-only header, body.graph-only .controls, body.graph-only #status, body.graph-only .cards, body.graph-only .table-section, body.graph-only .chart-heading { display: none; }
+    body.graph-only .chart-panel { height: 100svh; border: 0; border-radius: 0; padding: 20px; }
+    body.graph-only #chart { height: calc(100svh - 40px); min-height: 0; }
+    body.graph-only #exit-graph { display: block; }
+    @media (max-width: 700px) {
+      header { display: block; }
+      header a { display: inline-block; margin-top: 12px; }
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .controls label, .controls select { width: 100%; }
+      #chart { min-height: 260px; }
+    }
+  </style>
+</head>
+<body>
+  <button id="exit-graph" type="button">Exit graph-only view</button>
+  <header>
+    <div><h1>Bugmoog Stats</h1><p style="margin:7px 0 0">Anonymous, aggregate usage patterns.</p></div>
+    <a href="../">Pugmoog homepage</a>
+  </header>
+
+  <section class="controls" aria-label="Graph controls">
+    <label>Show
+      <select id="series">
+        <option value="bugmoog">Bugmoog opens</option>
+        <option value="all-games">All game opens</option>
+        <option value="chat">Chat opens</option>
+        <option value="proxy">Proxy opens</option>
+      </select>
+    </label>
+    <label>Measure
+      <select id="metric">
+        <option value="opens">Total opens</option>
+        <option value="uniqueDevices">Unique devices per interval</option>
+      </select>
+    </label>
+    <label>Time
+      <select id="range">
+        <option value="1">Last 24 hours</option>
+        <option value="7">Last 7 days</option>
+        <option value="30" selected>Last 30 days</option>
+        <option value="90">Last 90 days</option>
+        <option value="all">All time</option>
+      </select>
+    </label>
+    <label>Detail
+      <select id="resolution">
+        <option value="auto">Automatic</option>
+        <option value="hour">Hourly</option>
+        <option value="day">Daily</option>
+      </select>
+    </label>
+    <button id="graph-only" type="button">Graph only</button>
+    <button id="refresh" type="button">Refresh</button>
+  </section>
+  <p id="status" role="status">Loading statistics…</p>
+
+  <section class="cards" aria-label="Totals for selected time">
+    <div class="card">Bugmoog opens<strong id="total-bugmoog">—</strong></div>
+    <div class="card">Game opens<strong id="total-games">—</strong></div>
+    <div class="card">Chat opens<strong id="total-chat">—</strong></div>
+    <div class="card">Proxy opens<strong id="total-proxy">—</strong></div>
+  </section>
+
+  <section class="chart-panel">
+    <div class="chart-heading"><h2 id="chart-title">Bugmoog opens</h2><span id="chart-range" class="note"></span></div>
+    <svg id="chart" viewBox="0 0 900 360" role="img" aria-labelledby="chart-title"></svg>
+    <div id="tooltip"></div>
+  </section>
+
+  <section class="table-section">
+    <h2>Games in this time range</h2>
+    <table>
+      <thead><tr><th>Game</th><th>Opens</th><th>Unique-device intervals</th></tr></thead>
+      <tbody id="game-table"></tbody>
+    </table>
+    <p class="note">“Unique devices per interval” deduplicates within each displayed hour or day. Data older than 31 days is stored only as daily totals.</p>
+  </section>
+
+  <script>
+    const API = "https://d3txi12i3pqbxm.cloudfront.net/bugmoog-stats/api";
+    const HOUR = 3600000;
+    const DAY = 86400000;
+    const controls = Object.fromEntries(["series", "metric", "range", "resolution"].map(id => [id, document.querySelector(`#${id}`)]));
+    const number = new Intl.NumberFormat();
+    let data = null;
+
+    function friendlyName(id) {
+      const special = { gdash: "Geometry Dash", escaperoad: "Escape Road", eaglercraft: "Minecraft", terretorial_io: "Terretorial.io", "CMMM-plus": "Cell Machine Mystic Mod Plus+", fnae: "Password Protected Game" };
+      return special[id] || id.replace(/-/g, " ").replace(/\b\w/g, letter => letter.toUpperCase());
+    }
+
+    function selectedRange() {
+      const value = controls.range.value;
+      return value === "all" ? 0 : Date.now() - Number(value) * DAY;
+    }
+
+    async function loadStats() {
+      document.querySelector("#status").textContent = "Loading statistics…";
+      const query = new URLSearchParams({ from: selectedRange(), to: Date.now(), resolution: controls.resolution.value, t: Date.now() });
+      try {
+        const response = await fetch(`${API}/stats?${query}`, { cache: "no-store" });
+        const body = await response.json();
+        if (!response.ok) throw new Error(body.error || `Request failed (${response.status}).`);
+        data = body;
+        populateGames();
+        render();
+        document.querySelector("#status").textContent = `Updated ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+      } catch (error) {
+        document.querySelector("#status").textContent = `Could not load statistics: ${error.message}`;
+      }
+    }
+
+    function gameRows() {
+      const map = new Map();
+      for (const row of data?.rows || []) if (row.event === "game_open") {
+        const item = map.get(row.subject) || { id: row.subject, opens: 0, uniqueDevices: 0 };
+        item.opens += Number(row.opens);
+        item.uniqueDevices += Number(row.uniqueDevices);
+        map.set(row.subject, item);
+      }
+      return [...map.values()].sort((a, b) => b.opens - a.opens || friendlyName(a.id).localeCompare(friendlyName(b.id)));
+    }
+
+    function populateGames() {
+      const current = controls.series.value;
+      controls.series.querySelectorAll("option[data-game]").forEach(option => option.remove());
+      const known = new Set((data?.totals || []).filter(row => row.event === "game_open").map(row => row.subject));
+      for (const id of [...known].sort((a, b) => friendlyName(a).localeCompare(friendlyName(b)))) {
+        const option = new Option(friendlyName(id), `game:${id}`);
+        option.dataset.game = "1";
+        controls.series.append(option);
+      }
+      if ([...controls.series.options].some(option => option.value === current)) controls.series.value = current;
+    }
+
+    function matches(row) {
+      const selected = controls.series.value;
+      if (selected === "all-games") return row.event === "game_open";
+      if (selected.startsWith("game:")) return row.event === "game_open" && row.subject === selected.slice(5);
+      return row.event === `${selected}_open`;
+    }
+
+    function timeline() {
+      if (!data) return [];
+      const values = new Map();
+      for (const row of data.rows.filter(matches)) values.set(Number(row.bucket), (values.get(Number(row.bucket)) || 0) + Number(row[controls.metric.value]));
+      const points = [];
+      const from = data.from || Math.min(...values.keys());
+      const to = data.to;
+      const cutoff = data.hourlySince;
+      const add = (start, end, step) => {
+        for (let time = Math.floor(start / step) * step; time < end; time += step) points.push({ time, value: values.get(time) || 0 });
+      };
+      if (controls.resolution.value === "day") add(from, to, DAY);
+      else if (controls.resolution.value === "hour") add(Math.max(from, cutoff), to, HOUR);
+      else {
+        if (from < cutoff) add(from, Math.min(to, cutoff), DAY);
+        if (to > cutoff) add(Math.max(from, cutoff), to, HOUR);
+      }
+      return points;
+    }
+
+    function title() {
+      const option = controls.series.selectedOptions[0]?.textContent || "Statistics";
+      return `${option} — ${controls.metric.selectedOptions[0].textContent}`;
+    }
+
+    function renderChart() {
+      const svg = document.querySelector("#chart");
+      const points = timeline();
+      const W = 900, H = 360, left = 58, right = 18, top = 18, bottom = 42;
+      const width = W - left - right, height = H - top - bottom;
+      const max = Math.max(1, ...points.map(point => point.value));
+      const x = index => left + (points.length <= 1 ? width / 2 : index / (points.length - 1) * width);
+      const y = value => top + height - value / max * height;
+      let html = "";
+      for (let index = 0; index <= 4; index++) {
+        const value = Math.round(max * (4 - index) / 4);
+        const yy = top + index / 4 * height;
+        html += `<line class="grid-line" x1="${left}" y1="${yy}" x2="${W-right}" y2="${yy}"/><text class="axis-label" x="${left-8}" y="${yy+4}" text-anchor="end">${number.format(value)}</text>`;
+      }
+      if (!points.length) html += `<text class="empty" x="${W/2}" y="${H/2}">No events in this range yet</text>`;
+      else {
+        const path = points.map((point, index) => `${index ? "L" : "M"}${x(index).toFixed(1)},${y(point.value).toFixed(1)}`).join(" ");
+        html += `<path class="data-line" d="${path}"/>`;
+        if (points.length < 80) html += points.map((point, index) => `<circle class="data-dot" cx="${x(index)}" cy="${y(point.value)}" r="2.5"/>`).join("");
+        const labels = [...new Set([0, Math.floor((points.length-1)/4), Math.floor((points.length-1)/2), Math.floor((points.length-1)*3/4), points.length-1])];
+        html += labels.map(index => `<text class="axis-label" x="${x(index)}" y="${H-12}" text-anchor="middle">${formatTime(points[index].time)}</text>`).join("");
+        html += `<rect id="chart-hit" x="${left}" y="${top}" width="${width}" height="${height}" fill="transparent"/>`;
+      }
+      svg.innerHTML = html;
+      const hit = document.querySelector("#chart-hit");
+      const tooltip = document.querySelector("#tooltip");
+      hit?.addEventListener("pointermove", event => {
+        const bounds = svg.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
+        const index = Math.round(ratio * (points.length - 1));
+        const point = points[index];
+        tooltip.textContent = `${new Date(point.time).toLocaleString()}: ${number.format(point.value)}`;
+        tooltip.style.display = "block";
+        tooltip.style.left = `${Math.min(event.clientX - bounds.left + 10, bounds.width - tooltip.offsetWidth - 8)}px`;
+        tooltip.style.top = `${Math.max(8, event.clientY - bounds.top - 40)}px`;
+      });
+      hit?.addEventListener("pointerleave", () => tooltip.style.display = "none");
+    }
+
+    function formatTime(time) {
+      const hourly = controls.resolution.value === "hour" || (controls.resolution.value === "auto" && time >= data.hourlySince);
+      return new Date(time).toLocaleString([], hourly ? { month: "short", day: "numeric", hour: "numeric" } : { month: "short", day: "numeric" });
+    }
+
+    function render() {
+      const rows = data?.rows || [];
+      const sum = event => rows.filter(row => row.event === event).reduce((total, row) => total + Number(row.opens), 0);
+      document.querySelector("#total-bugmoog").textContent = number.format(sum("bugmoog_open"));
+      document.querySelector("#total-games").textContent = number.format(sum("game_open"));
+      document.querySelector("#total-chat").textContent = number.format(sum("chat_open"));
+      document.querySelector("#total-proxy").textContent = number.format(sum("proxy_open"));
+      document.querySelector("#chart-title").textContent = title();
+      document.querySelector("#chart-range").textContent = `${new Date(data.from).toLocaleDateString()} – ${new Date(data.to).toLocaleDateString()}`;
+      document.querySelector("#game-table").innerHTML = gameRows().map((game, index) => `<tr><td>${index + 1}. ${friendlyName(game.id)}</td><td>${number.format(game.opens)}</td><td>${number.format(game.uniqueDevices)}</td></tr>`).join("") || '<tr><td colspan="3">No game opens in this range yet.</td></tr>';
+      renderChart();
+    }
+
+    controls.series.addEventListener("change", render);
+    controls.metric.addEventListener("change", render);
+    controls.range.addEventListener("change", loadStats);
+    controls.resolution.addEventListener("change", loadStats);
+    document.querySelector("#refresh").addEventListener("click", loadStats);
+    document.querySelector("#graph-only").addEventListener("click", () => { document.body.classList.add("graph-only"); renderChart(); });
+    document.querySelector("#exit-graph").addEventListener("click", () => { document.body.classList.remove("graph-only"); renderChart(); });
+    window.addEventListener("resize", () => data && renderChart());
+    loadStats();
+  </script>
+</body>
+</html>
